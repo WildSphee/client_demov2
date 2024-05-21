@@ -83,7 +83,6 @@ def main():
         res = create_chat_completion(chat_payload, usecase_session_id)
         # extract content
         content: str = dict(res.json())["choices"][0]["message"]["content"]
-        content = content.replace("#", "")
         
         with st.expander("Analysis Report", expanded=True):
             with st.chat_message("Assistant"):
