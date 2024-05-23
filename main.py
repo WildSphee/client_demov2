@@ -13,7 +13,7 @@ load_dotenv()
 name_2_usecase_name: Dict = {
     "Sales Manager": "sales_manager_persona",
     "Compliance Officer": "compliance_officer_persona",
-    "Product Manager": "product_manager_persona",
+    "Training Manager": "product_manager_persona",  # as of v4, product manager is renamed to training manager 
     }
 
 # create sessions for experts
@@ -52,7 +52,7 @@ def main():
             
             session_id = create_session_experts(expert_usecase, user_input)
             print(f"{expert}'s session ID: {session_id}")
-            chat_payload = {'model': expert_usecase, 'messages': [{'role': 'system', 'content': ''}], 'max_tokens': 700}
+            chat_payload = {'model': expert_usecase, 'messages': [{'role': 'system', 'content': ''}], 'max_tokens': None}
             res = create_chat_completion(chat_payload=chat_payload, session_id=session_id)
             
             # extract content
