@@ -1,12 +1,11 @@
 import streamlit as st
 import requests
-from api import create_chat_completion, _get_headers
 from dotenv import load_dotenv
 import os
-import session
 from typing import Dict, List, Tuple
 from dialogues import default_convo
 import io
+
 
 load_dotenv()
 
@@ -15,6 +14,18 @@ name_2_usecase_name: Dict = {
     "Compliance Officer": "compliance_officer_persona",
     "Training Manager": "product_manager_persona",  # as of v4, product manager is renamed to training manager 
     }
+
+
+def _get_headers():
+    return {"Authorization": f"Bearer {os.getenv('NEXTGPT_API_KEY')}"}
+
+
+def create_chat_completion(chat_payload, session_id):
+    headers = _get_headers()
+    url = f"http://localhost:8111/api/v1/chat/completions?debug=True"
+    if session_id:
+        url += f"&session_id={session_id}"
+    return requests.post(url, json=chat_payload, headers=headers)
 
 # create sessions for experts
 def create_session_experts(expert: str, user_input: str) -> str:
@@ -36,9 +47,8 @@ def main():
 
     col1, col2 = st.columns(2)
     # Text input for user queries
-    experts = []
+    experts = name_2_usecase_name.keys()
     with col1:
-        experts = ["Sales Manager", "Compliance Officer", "Product Manager"]
         experts_selected = st.multiselect("Select Experts", experts, default=experts)
     with col2:
         user_input = st.text_area("Enter the conversation:", value=default_convo, height=400)
@@ -75,6 +85,7 @@ def main():
 
                     expert_data += f"Expert: {message[0]}\n\nOpinion: {message[1]}*********\n\n"
 
+
         # create session for the rm usecase
         usecase_session_id = create_session_useacse(user_input, expert_data)
         print(f"1_RM_Client demo session ID: {usecase_session_id}")
@@ -88,7 +99,6 @@ def main():
             with st.chat_message("Assistant"):
                 st.write(content)
 
-        
 
 if __name__ == "__main__":
     main()
